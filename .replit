@@ -1,0 +1,30 @@
+modules = ["bash", "nodejs-20", "python-3.11"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["cacert", "glibcLocales", "libxcrypt"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Medical Agent"
+
+[[workflows.workflow]]
+name = "Medical Agent"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python medical-multillmagent.py"
+
+[workflows.workflow.metadata]
+outputType = "console"
