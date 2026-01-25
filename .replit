@@ -16,15 +16,20 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Medical Agent"
+args = "Medical Agent API"
 
 [[workflows.workflow]]
-name = "Medical Agent"
+name = "Medical Agent API"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python medical-multillmagent.py"
+args = "python main.py"
+waitForPort = 5000
 
 [workflows.workflow.metadata]
-outputType = "console"
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

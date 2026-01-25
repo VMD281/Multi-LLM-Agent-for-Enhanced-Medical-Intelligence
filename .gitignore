@@ -22,3 +22,6 @@ wheels/
 *.egg
 .cache/
 .local/
+.pythonlibs/
+*.pyc
+.upm/

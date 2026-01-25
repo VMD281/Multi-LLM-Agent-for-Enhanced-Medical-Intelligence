@@ -1,17 +1,32 @@
+import os
 import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from src.agents.orchestrator import MedicalAgentOrchestrator
 from src.models.schemas import QueryRequest, MedicalResponse, SearchResult
 
 router = APIRouter()
 
 orchestrator = None
 
+def check_required_keys():
+    missing = []
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        missing.append("ANTHROPIC_API_KEY")
+    if not os.getenv("NCBI_API_KEY"):
+        missing.append("NCBI_API_KEY")
+    return missing
+
 def get_orchestrator():
     global orchestrator
+    missing = check_required_keys()
+    if missing:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Missing required API keys: {', '.join(missing)}. Please configure them in your environment."
+        )
     if orchestrator is None:
+        from src.agents.orchestrator import MedicalAgentOrchestrator
         orchestrator = MedicalAgentOrchestrator()
     return orchestrator
 
@@ -19,6 +34,8 @@ def get_orchestrator():
 class HealthResponse(BaseModel):
     status: str
     version: str
+    api_keys_configured: bool
+    missing_keys: List[str]
 
 
 class QueryParseRequest(BaseModel):
@@ -34,7 +51,13 @@ class ParsedQuery(BaseModel):
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    return HealthResponse(status="healthy", version="1.0.0")
+    missing = check_required_keys()
+    return HealthResponse(
+        status="healthy" if not missing else "degraded",
+        version="1.0.0",
+        api_keys_configured=len(missing) == 0,
+        missing_keys=missing
+    )
 
 
 @router.post("/parse", response_model=ParsedQuery)

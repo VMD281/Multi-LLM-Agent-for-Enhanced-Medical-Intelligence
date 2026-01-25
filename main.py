@@ -51,22 +51,25 @@ def check_api_keys():
     if not os.getenv("NCBI_API_KEY"):
         missing.append("NCBI_API_KEY")
     if not os.getenv("BRAVE_SEARCH_API_KEY"):
-        print("[WARNING] BRAVE_SEARCH_API_KEY not set - web search will be disabled")
+        print("[INFO] BRAVE_SEARCH_API_KEY not set - web search will be limited")
     
     if missing:
-        print(f"[ERROR] Missing required API keys: {', '.join(missing)}")
-        print("Please set these environment variables to use the system.")
-        return False
+        print(f"[WARNING] Missing API keys: {', '.join(missing)}")
+        print("The server will start, but queries will fail until keys are set.")
+        print("Visit /docs for API documentation.")
+    else:
+        print("[OK] All required API keys configured")
+    
     return True
 
 
 if __name__ == "__main__":
-    if check_api_keys():
-        uvicorn.run(
-            "main:app",
-            host="0.0.0.0",
-            port=5000,
-            reload=True
-        )
-    else:
-        print("Exiting due to missing API keys.")
+    check_api_keys()
+    print("\nStarting Multi-Agent Medical Intelligence System...")
+    print("API Documentation: http://0.0.0.0:5000/docs")
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=5000,
+        reload=True
+    )
