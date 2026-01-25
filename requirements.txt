@@ -21,3 +21,10 @@ anthropic
 pydantic
 python-dotenv
 requests
+faiss-cpu
+fastapi
+langchain
+langchain-anthropic
+langchain-community
+langgraph
+uvicorn
